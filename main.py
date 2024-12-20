@@ -1,13 +1,12 @@
 import telebot
+from telebot import types
 import os
 from dotenv import load_dotenv
-from telebot import types
 
 load_dotenv()
 
 TK = os.getenv('tb')
 bot = telebot.TeleBot(TK)
-
 @bot.message_handler(commands=['start'])
 def main(message):
     with open('./.venv/imagine/kk.jpeg', 'rb') as file:
