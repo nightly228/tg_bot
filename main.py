@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TK = os.getenv('TB')
+TK = os.getenv('tb')
 bot = telebot.TeleBot(TK)
 
 @bot.message_handler(commands=['start'])
