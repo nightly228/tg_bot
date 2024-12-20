@@ -138,4 +138,5 @@ import telebot
   def back_to_menu(message):
       main(message)
 
-  bot.polling(none_stop=True)
+  if __name__ == "__main__":
+     bot.polling(none_stop=True)
