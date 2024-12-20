@@ -1,25 +1,25 @@
 import telebot
-from telebot import types
-import os
-from dotenv import load_dotenv
+    from telebot import types
+    import os
+    from dotenv import load_dotenv
 
-load_dotenv()
+    load_dotenv()
 
-TK = os.getenv('tb')
-bot = telebot.TeleBot(TK)
-@bot.message_handler(commands=['start'])
-def main(message):
-    with open('./.venv/imagine/kk.jpeg', 'rb') as file:
-        bot.send_photo(message.chat.id, file)
+    TK = os.getenv('tb')
+    bot = telebot.TeleBot(TK)
+    @bot.message_handler(commands=['start'])
+    def main(message):
+        with open('./.venv/imagine/kk.jpeg', 'rb') as file:
+           bot.send_photo(message.chat.id, file)
 
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton("Наличие")
-    button2 = types.KeyboardButton("Под заказ")
-    button3 = types.KeyboardButton("Уход")
-    button4 = types.KeyboardButton("Подписаться на канал")
-    keyboard.add(button1, button2, button3, button4)
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button1 = types.KeyboardButton("Наличие")
+        button2 = types.KeyboardButton("Под заказ")
+        button3 = types.KeyboardButton("Уход")
+        button4 = types.KeyboardButton("Подписаться на канал")
+        keyboard.add(button1, button2, button3, button4)
 
-    bot.send_message(message.chat.id,
+     bot.send_message(message.chat.id,
                      'Доброго времени суток!\nУбедительная просьба: не тыкайте на все кнопочки сразу, так как бот может подвиснуть. Спасибо!\nЭтот бот поможет Вам с выбором эко-подарка и поможет узнать что-то новое, оставайтесь с нами!', reply_markup=keyboard)
 
 
@@ -35,20 +35,20 @@ current_photo_index = 0
 
 
 
-@bot.message_handler(func=lambda message: message.text == "Наличие")
-def show_photos(message):
-    global current_photo_index
-    current_photo_index = 0
-    send_photo_with_caption(message.chat.id, current_photo_index)
+    @bot.message_handler(func=lambda message: message.text == "Наличие")
+    def show_photos(message):
+       global current_photo_index
+       current_photo_index = 0
+       send_photo_with_caption(message.chat.id, current_photo_index)
 
 
-def send_photo_with_caption(chat_id, index):
-    if index < 0 or index >= len(photos):
-        return
+    def send_photo_with_caption(chat_id, index):
+       if index < 0 or index >= len(photos):
+          return
 
-    photo_path, caption = photos[index]
+       photo_path, caption = photos[index]
 
-    try:
+     try:
         with open(photo_path, 'rb') as photo_file:
             bot.send_photo(chat_id, photo_file, caption=caption)
     except Exception as e:
