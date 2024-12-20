@@ -1,12 +1,12 @@
 import telebot
-   from telebot import types
-   import os
-   from dotenv import load_dotenv
+from telebot import types
+import os
+from dotenv import load_dotenv
 
-   load_dotenv()
+load_dotenv()
 
-   TK = os.getenv('TB')
-   bot = telebot.TeleBot(TK)
+TK = os.getenv('TB')
+bot = telebot.TeleBot(TK)
 
 @bot.message_handler(commands=['start'])
 def main(message):
