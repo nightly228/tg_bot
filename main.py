@@ -137,5 +137,5 @@ def show_care_instructions(message: types.Message) -> None:
 
 
 # Запуск бота
-if name == "main":
+if main == "main":
     bot.polling(none_stop=True)
