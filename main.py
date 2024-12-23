@@ -4,20 +4,25 @@ import os
 from dotenv import load_dotenv
 from typing import List, Tuple
 
+# Загрузка токена из .env
 load_dotenv()
 tb = os.getenv('tb')
+
 if not tb:
     raise ValueError("Токен Telegram Bot не найден в файле .env")
+
 bot = telebot.TeleBot(tb)
 
+# Тип данных для хранения фотографий и их описаний
 photos: List[Tuple[str, str]] = [
-    ('./imagine/1r.jpeg', 'Стильное панно влюбленные!\nШирина: 85 см\nВысота: 50 см\nОснова: хдф\nСтабилизированный мох:\nДекор под заказ\nМнoго издeлий в наличии\nВыбор цвета мха из палитры 35+оттенков\nНе требует полива\nОтличный подapок\nВ случае если у вас очень ограничен бюджет на озеленение, напишите мне, я вам предложу вам способ с минимальными затратами и максимальным визуальным эффектом\n4150₽\nДля заказа пишите @mossnasty\nВ сообщении укажите: фото желаемого пано, Ваше ФИО, адрес доставки полностью'),
+    ('./imagine/1r.jpeg', 'Стильное панно влюбленные!\nШирина: 85 см\nВысота: 50 см\nОснова: хдф\nСтабилизированный мох: ...'),
     ('./imagine/2r.jpeg', 'Стильное панно дерево!\nШирина: 137 см\nВысота: 81 см\nОснова: фанера\n7500₽'),
     ('./imagine/3r.jpeg', '1890 ₽'),
     ('./imagine/4r.jpeg', '2450 ₽'),
     ('./imagine/5r.jpeg', 'Длина: 50 см\nВысота: 50 см\nОснова: дерево\n3700 ₽')
 ]
 
+# Индекс текущего фото
 current_photo_index: int = 0
 
 
@@ -99,11 +104,11 @@ def back_to_menu(message: types.Message) -> None:
     """Возвращает пользователя в главное меню."""
     main(message)
 
-
 @bot.message_handler(func=lambda message: message.text == "Под заказ")
 def show_order_info(message: types.Message) -> None:
     """Информация о заказе."""
-    bot.send_message(message.chat.id,
+    bot.send_message(
+        message.chat.id,
         (
             'Не нашли подходящее? Пишите, согласуем:  @mossnasty\n'
             'В сообщении укажите:\n'
@@ -113,29 +118,29 @@ def show_order_info(message: types.Message) -> None:
         )
     )
 
+    @bot.message_handler(func=lambda message: message.text == "Подписаться на канал")
+    def show_join_staby(message: types.Message) -> None:
+        """Ссылка на канал."""
+        bot.send_message(message.chat.id, 'Больше интересного здесь: @stabymoh')
 
-@bot.message_handler(func=lambda message: message.text == "Подписаться на канал")
-def show_join_staby(message: types.Message) -> None:
-    """Ссылка на канал."""
-    bot.send_message(message.chat.id, 'Больше интересного здесь: @stabymoh')
-
-
-@bot.message_handler(func=lambda message: message.text == "Уход")
-def show_care_instructions(message: types.Message) -> None:
-    """Инструкция по уходу за стабилизированным мхом."""
-    bot.send_message(
-        message.chat.id,
-        (
-            'Инструкция по уходу за стабилизированным мхом:\n'
-            '- Температура: от +5 до +30 °C, влажность 60-80%.\n'
-            '- Избегайте попадания прямых солнечных лучей и близкого расположения источников тепла.\n'
-            '- Не допускайте попадания воды: не поливать, не опрыскивать.\n'
-            '- Избегайте резких колебаний температуры и влажности.\n'
-            '- Не использовать в помещениях с влажностью менее 30% или выше 80%.'
+    @bot.message_handler(func=lambda message: message.text == "Уход")
+    def show_care_instructions(message: types.Message) -> None:
+        """Инструкция по уходу за стабилизированным мхом."""
+        bot.send_message(
+            message.chat.id,
+            (
+                'Инструкция по уходу за стабилизированным мхом:\n'
+                '- Температура: от +5 до +30 °C, влажность 60-80%.\n'
+                '- Избегайте попадания прямых солнечных лучей и близкого расположения источников тепла.\n'
+                '- Не допускайте попадания воды: не поливать, не опрыскивать.\n'
+                '- Избегайте резких колебаний температуры и влажности.\n'
+                '- Не использовать в помещениях с влажностью менее 30% или выше 80%.'
+            )
         )
-    )
 
+    # Логирование
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(name)
 
-# Запуск бота
-if main == "main":
-    bot.polling(none_stop=True)
+bot.polling(none_stop=True)
