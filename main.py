@@ -3,13 +3,15 @@ from telebot import types
 
 import os
 from dotenv import load_dotenv
+from typing import List, Tuple, Optional
 
 load_dotenv()
 
-TK = os.getenv('tb')
-bot = telebot.TeleBot(TK)
+TK: str = os.getenv('tb')
+bot: telebot.TeleBot = telebot.TeleBot(TK)
+
 @bot.message_handler(commands=['start'])
-def main(message):
+def main(message: types.Message) -> None:
     with open('./imagine/kk.jpeg', 'rb') as file:
         bot.send_photo(message.chat.id, file)
 
@@ -24,7 +26,7 @@ def main(message):
                      'Доброго времени суток!\nЭтот бот поможет Вам с выбором эко-подарка и поможет узнать что-то новое, оставайтесь с нами!', reply_markup=keyboard)
 
 
-photos = [
+photos: List[Tuple[str, str]] = [
     ('./imagine/1r.jpeg', 'Стильное панно влюбленные!\nШирина: 85 см\nВысота: 50 см\nОснова: хдф\nСтабилизированный мох:\nДекор под заказ\n Мнoго издeлий в наличии\n Выбор цвета мха из палитры 35+оттенков\nНе требует полива\nОтличный подapок\nВ случае если у вас очень ограничен бюджет на озеленение, напишите мне, я вам предложу вам способ с минимальными затратами и максимальным визуальным эффектом\n4150₽\nДля заказа пишите @mossnasty\nВ сообщении укажите: фото желаемого пано, Ваше ФИО, адрес доставки полностью '),
     ('./imagine/2r.jpeg', 'Стильное панно дерево!\nШирина: 137 см\nВысота: 81 см\nОснова: фанера\n7500₽'),
     ('./imagine/3r.jpeg', '1890 ₽'),
@@ -43,10 +45,13 @@ def show_photos(message):
     send_photo_with_caption(message.chat.id, current_photo_index)
 
 
-def send_photo_with_caption(chat_id, index):
+def send_photo_with_caption(chat_id: int, index: int) -> None:
+    """Отправляет фото с подписью в указанный чат."""
     if index < 0 or index >= len(photos):
         return
-
+        
+    photo_path: str
+    caption: str
     photo_path, caption = photos[index]
 
     try:
