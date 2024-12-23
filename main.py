@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from typing import List, Tuple
 
 load_dotenv()
-TOKEN = os.getenv('tb')
-if not TOKEN:
+tb = os.getenv('tb')
+if not tb:
     raise ValueError("Токен Telegram Bot не найден в файле .env")
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(tb)
 
 photos: List[Tuple[str, str]] = [
     ('./imagine/1r.jpeg', 'Стильное панно влюбленные!\nШирина: 85 см\nВысота: 50 см\nОснова: хдф\nСтабилизированный мох:\nДекор под заказ\nМнoго издeлий в наличии\nВыбор цвета мха из палитры 35+оттенков\nНе требует полива\nОтличный подapок\nВ случае если у вас очень ограничен бюджет на озеленение, напишите мне, я вам предложу вам способ с минимальными затратами и максимальным визуальным эффектом\n4150₽\nДля заказа пишите @mossnasty\nВ сообщении укажите: фото желаемого пано, Ваше ФИО, адрес доставки полностью'),
