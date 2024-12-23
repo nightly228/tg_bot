@@ -85,17 +85,6 @@ def show_facts(message: types.Message) -> None:
         'Избегать прямого попадания воды, не поливать, не опрыскивать, не допускать резких колебаний температуры, приводящих к появлению конденсированной влаги. Не мыть стабилизированный мох в воде.'
     ))
 
-# Убедитесь, что функция `send_photo_with_caption` уникальна и не повторяется.
-
-from telebot import types, TeleBot
-from typing import List, Tuple
-
-# Определите свои переменные, включая photos и другие настройки
-photos: List[Tuple[str, str]] = [
-    ('./imagine/1r.jpeg', 'Описание 1'),
-    ('./imagine/2r.jpeg', 'Описание 2'),
-    # Добавьте остальные фотографии и описания
-]
 
 current_photo_index: int = 0
 
