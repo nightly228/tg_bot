@@ -58,11 +58,7 @@ def send_photo_with_caption(chat_id: int, index: int) -> None:
         print(f"Ошибка: файл не найден - {e}")
     except telebot.apihelper.ApiTelegramException as e:
         print(f"Ошибка Telegram API - {e}")
-    except Exception as e:
-        print(f"Произошла ошибка - {e}")
         
-
-    photo_path: str
     caption: str
     photo_path, caption = photos[index]
 
