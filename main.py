@@ -1,13 +1,26 @@
 import telebot
+from flask import Flask, request
 from telebot import types
 import os
 from dotenv import load_dotenv
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 
 load_dotenv()
 
-TK: str = os.getenv('tb')
-bot: telebot.TeleBot = telebot.TeleBot(TK)
+TOKEN: str = os.getenv("tb")
+bot = telebot.TeleBot(TOKEN)
+server = Flask(__name__)
+
+# Список фото и описаний
+photos: List[Tuple[str, str]] = [
+    ('./imagine/1r.jpeg', 'Описание товара 1'),
+    ('./imagine/2r.jpg', 'Описание товара 2'),
+    ('./imagine/3r.jpg', 'Описание товара 3'),
+    ('./imagine/4r.jpg', 'Описание товара 4'),
+    ('./imagine/5r.jpg', 'Описание товара 5')
+]
+
+current_photo_index: int = 0
 
 @bot.message_handler(commands=['start'])
 def main(message: types.Message) -> None:
@@ -16,30 +29,18 @@ def main(message: types.Message) -> None:
             bot.send_photo(message.chat.id, file)
 
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        button1 = types.KeyboardButton("Наличие")
-        button2 = types.KeyboardButton("Под заказ")
-        button3 = types.KeyboardButton("Уход")
-        button4 = types.KeyboardButton("Подписаться на канал")
-        keyboard.add(button1, button2, button3, button4)
+        keyboard.add(
+            types.KeyboardButton("Наличие"),
+            types.KeyboardButton("Под заказ"),
+            types.KeyboardButton("Уход"),
+            types.KeyboardButton("Подписаться на канал")
+        )
 
         bot.send_message(message.chat.id,
-                         'Доброго времени суток!\nЭтот бот поможет Вам с выбором эко-подарка и поможет узнать что-то новое, оставайтесь с нами!', reply_markup=keyboard)
-    except FileNotFoundError as e:
-        print(f"Ошибка: файл не найден - {e}")
-    except telebot.apihelper.ApiTelegramException as e:
-        print(f"Ошибка Telegram API - {e}")
+                         'Доброго времени суток! Этот бот поможет Вам с выбором эко-подарка!',
+                         reply_markup=keyboard)
     except Exception as e:
-        print(f"Произошла ошибка - {e}")
-
-photos: List[Tuple[str, str]] = [
-    ('./imagine/1r.jpeg', 'Стильное панно влюбленные!\nШирина: 85 см\nВысота: 50 см\nОснова: хдф\nСтабилизированный мох:\nДекор под заказ\n Мнoго издeлий в наличии\n Выбор цвета мха из палитры 35+оттенков\nНе требует полива\nОтличный подapок\nВ случае если у вас очень ограничен бюджет на озеленение, напишите мне, я вам предложу вам способ с минимальными затратами и максимальным визуальным эффектом\n4000₽\nДля заказа пишите @mossnasty\nВ сообщении укажите: фото желаемого пано, Ваше ФИО, адрес доставки полностью '),
-    ('./imagine/2r.jpg', '🌳Mодульнoе паннo дeрево 🌳\nШирина: 60 cм\nВыcотa: 44 cм\n❗️ценa:3000₽ при самoвывoзe 2700₽\nOcнoва: дерeвo 🪵'),
-    ('./imagine/3r.jpg', '🎁Набор из тpёх пaнно.(Можнo пpиобpеcти пo oтдeльнocти)\nДиаметр: 25 cм.\nOснова: МДФ с кpеплением\n❗️Цена за 3: 6500₽ при cамовывозe 6100 '),
-    ('./imagine/4r.jpg', '🎁 Mодульнoe пaнно\nШиpинa: 146\nВысота: 74\nOснoва: дepeво\n❗️цeнa:9000₽, cамoвывoз:8500₽'),
-    ('./imagine/5r.jpg', '🌿Стабилизированный мох\n150₽\n‼️В наличии несколько оттенков\n🔥100 г\n🎨 Не красится\n♻️ Без мусора\n🖼️ Идеально подойдет для украшения интерьера\n❗️Высокое качество по доступной цене ')
-]
-
-current_photo_index: int = 0
+        print(f"[start error] {e}")
 
 @bot.message_handler(func=lambda message: message.text == "Наличие")
 def show_photos(message: types.Message) -> None:
@@ -52,51 +53,60 @@ def send_photo_with_caption(chat_id: int, index: int) -> None:
         photo_path, caption = photos[index]
         with open(photo_path, 'rb') as file:
             bot.send_photo(chat_id, file, caption=caption)
-    except IndexError as e:
-        print(f"Ошибка: индекс вне диапазона - {e}")
-    except FileNotFoundError as e:
-        print(f"Ошибка: файл не найден - {e}")
-    except telebot.apihelper.ApiTelegramException as e:
-        print(f"Ошибка Telegram API - {e}")
-        
-    caption: str
-    photo_path, caption = photos[index]
 
-  
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    if index < len(photos) - 1:
-        keyboard.add(types.KeyboardButton("Вперед"))
-    if index > 0:
-        keyboard.add(types.KeyboardButton("Назад"))
-    
-    keyboard.add(types.KeyboardButton("Назад в меню"))
-    bot.send_message(chat_id, 'Выберите действие:', reply_markup=keyboard)
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        if index < len(photos) - 1:
+            keyboard.add(types.KeyboardButton("Вперед"))
+        if index > 0:
+            keyboard.add(types.KeyboardButton("Назад"))
+        keyboard.add(types.KeyboardButton("Назад в меню"))
+        bot.send_message(chat_id, "Выберите действие:", reply_markup=keyboard)
 
-@bot.message_handler(func=lambda message: message.text == "Под заказ")
-def show_order_info(message: types.Message) -> None:
-    bot.send_message(message.chat.id, 'Не нашли подходящее? Пишите, согласуем:  @mossnasty\n В сообщении укажите:\nПожелания, референсы\nФИО\nСтрана, Город, Улица, дом, кв и почтовый индекс ')
-
-@bot.message_handler(func=lambda message: message.text == "Подписаться на канал")
-def show_join_staby(message: types.Message) -> None:
-    bot.send_message(message.chat.id, 'Больше интересного здесь: @stabymoh')
-
-@bot.message_handler(func=lambda message: message.text == "Уход")
-def show_facts(message: types.Message) -> None:
-    bot.send_message(message.chat.id, 'Инструкция по уходу за стабилизированным мхом:\nСтабилизированный мох должен находиться в закрытом помещении при температуре от +5 до +30 градусов Цельсия и влажности 60-80%.\nНеобходимо предохранять их от попадания прямых солнечных лучей, близкого расположения галогенных ламп и других источников повышенной температуры, а также систем кондиционирования воздуха и вентиляции, которые могут привести к преждевременному высыханию мха.\n•Необходимо избегать хранения стабилизированного мха в помещениях с повышенной влажностью, а также сухих помещениях, с влажностью менее 30%.\nИзбегать прямого попадания воды, не поливать, не опрыскивать, не допускать резких колебаний температуры, приводящих к появлению конденсированной влаги.\n Не мыть стабилизированный мох в воде.')
+    except Exception as e:
+        print(f"[photo error] {e}")
 
 @bot.message_handler(func=lambda message: message.text in ["Вперед", "Назад"])
 def change_photo(message: types.Message) -> None:
     global current_photo_index
-
     if message.text == "Назад" and current_photo_index > 0:
         current_photo_index -= 1
     elif message.text == "Вперед" and current_photo_index < len(photos) - 1:
         current_photo_index += 1
-
     send_photo_with_caption(message.chat.id, current_photo_index)
 
 @bot.message_handler(func=lambda message: message.text == "Назад в меню")
 def back_to_menu(message: types.Message) -> None:
     main(message)
 
-bot.polling(none_stop=True)
+@bot.message_handler(func=lambda message: message.text == "Под заказ")
+def show_order_info(message: types.Message) -> None:
+    bot.send_message(message.chat.id,
+                     'Пишите @mossnasty\nУкажите: пожелания, ФИО, адрес.')
+
+@bot.message_handler(func=lambda message: message.text == "Подписаться на канал")
+def show_join_staby(message: types.Message) -> None:
+    bot.send_message(message.chat.id,
+                     'Больше интересного здесь: @stabymoh')
+
+@bot.message_handler(func=lambda message: message.text == "Уход")
+def show_facts(message: types.Message) -> None:
+    bot.send_message(message.chat.id,
+                     'Инструкция по уходу за стабилизированным мхом:\n...')
+
+# Webhook обработчик
+@server.route(f"/{TOKEN}", methods=["POST"])
+def webhook() -> tuple:
+    update = telebot.types.Update.de_json(request.data.decode("utf-8"))
+    bot.process_new_updates([update])
+    return "ok", 200
+
+# Установка Webhook
+@server.route("/", methods=["GET"])
+def set_webhook() -> tuple:
+    bot.remove_webhook()
+    webhook_url = f"https://{os.getenv('RENDER_URL')}/{TOKEN}"
+    bot.set_webhook(url=webhook_url)
+    return "Webhook установлен", 200
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
