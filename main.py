@@ -1,17 +1,21 @@
-import telebot
-from flask import Flask, request
-from telebot import types
 import os
+from flask import Flask, request
+import telebot
+from telebot import types
 from dotenv import load_dotenv
 from typing import List, Tuple
 
 load_dotenv()
 
 TOKEN: str = os.getenv("tb")
+RENDER_URL: str = os.getenv("RENDER_URL")
+
+if not TOKEN or not RENDER_URL:
+    raise ValueError("❌ Не найдены переменные окружения 'tb' и/или 'RENDER_URL'")
+
 bot = telebot.TeleBot(TOKEN)
 server = Flask(__name__)
 
-# Список фото и описаний
 photos: List[Tuple[str, str]] = [
     ('./imagine/1r.jpeg', 'Описание товара 1'),
     ('./imagine/2r.jpg', 'Описание товара 2'),
@@ -93,20 +97,26 @@ def show_facts(message: types.Message) -> None:
     bot.send_message(message.chat.id,
                      'Инструкция по уходу за стабилизированным мхом:\n...')
 
-# Webhook обработчик
+# Webhook для Telegram
 @server.route(f"/{TOKEN}", methods=["POST"])
 def webhook() -> tuple:
     update = telebot.types.Update.de_json(request.data.decode("utf-8"))
     bot.process_new_updates([update])
     return "ok", 200
 
-# Установка Webhook
+# Ручная установка webhook
 @server.route("/", methods=["GET"])
 def set_webhook() -> tuple:
+    print("➡ Установка webhook...")
+    print("RENDER_URL =", RENDER_URL)
+    print("TOKEN =", TOKEN)
+
     bot.remove_webhook()
-    webhook_url = f"https://{os.getenv('RENDER_URL')}/{TOKEN}"
+    webhook_url = f"https://{RENDER_URL}/{TOKEN}"
     bot.set_webhook(url=webhook_url)
-    return "Webhook установлен", 200
+    return "✅ Webhook установлен", 200
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    print(f"🚀 Старт сервера на порту {port}")
+    server.run(host="0.0.0.0", port=port)
